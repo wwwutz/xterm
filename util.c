@@ -5628,10 +5628,11 @@ pixelsAreRGB(XtermWidget xw)
 	    && xw->visInfo->class == TrueColor);
 }
 
-static Bool
-pixelToRGB(XtermWidget xw, Pixel p, unsigned *rgb)
+/* Like QueryOneColor(), without a round-trip for TrueColor visuals */
+static Boolean
+fastQueryColor(XtermWidget xw, XColor *def)
 {
-    Bool result = True;
+    Boolean result = True;
 
     if (pixelsAreRGB(xw)) {
 	const unsigned long mask[3] =
@@ -5640,46 +5641,44 @@ pixelToRGB(XtermWidget xw, Pixel p, unsigned *rgb)
 	    xw->visInfo->green_mask,
 	    xw->visInfo->blue_mask
 	};
+	unsigned short value[3];
 	unsigned n;
 
 	for (n = 0; n < 3; ++n) {
 	    unsigned long top = (1UL << xw->rgb_widths[n]) - 1;
-	    unsigned long v = (p & mask[n]) >> xw->rgb_shifts[n];
-	    rgb[n] = (unsigned) ((v * 255 + top / 2) / top);
+	    unsigned long v = (def->pixel & mask[n]) >> xw->rgb_shifts[n];
+	    value[n] = (unsigned short) ((v * 65535 + top / 2) / top);
 	}
+	def->red = value[0];
+	def->green = value[1];
+	def->blue = value[2];
     } else {
-	XColor def;
-
-	def.pixel = p;
-	result = QueryOneColor(xw, &def);
-	rgb[0] = (unsigned) (def.red >> 8);
-	rgb[1] = (unsigned) (def.green >> 8);
-	rgb[2] = (unsigned) (def.blue >> 8);
+	result = QueryOneColor(xw, def);
     }
     return result;
 }
 
-static Bool
-rgbToPixel(XtermWidget xw, const unsigned *rgb, Pixel *p)
+/* Like allocateBestRGB(), without a round-trip for TrueColor visuals */
+static Boolean
+fastAllocColor(XtermWidget xw, XColor *def)
 {
-    Bool result = True;
+    Boolean result = True;
 
     if (pixelsAreRGB(xw)) {
+	const unsigned short value[3] =
+	{
+	    def->red, def->green, def->blue
+	};
 	unsigned n;
 
-	*p = 0;
+	def->pixel = 0;
 	for (n = 0; n < 3; ++n) {
 	    unsigned long top = (1UL << xw->rgb_widths[n]) - 1;
-	    *p |= ((rgb[n] * top + 127) / 255) << xw->rgb_shifts[n];
+	    def->pixel |= (((unsigned long) value[n] * top + 32767) / 65535)
+		<< xw->rgb_shifts[n];
 	}
     } else {
-	XColor def;
-
-	def.red = (unsigned short) (rgb[0] * 257);
-	def.green = (unsigned short) (rgb[1] * 257);
-	def.blue = (unsigned short) (rgb[2] * 257);
-	if ((result = allocateBestRGB(xw, &def)))
-	    *p = def.pixel;
+	result = allocateBestRGB(xw, def);
     }
     return result;
 }
@@ -5725,12 +5724,21 @@ contrastingForeground(XtermWidget xw, unsigned attr_flags, Pixel fg, Pixel bg)
 	&& ht[hv].wanted == wanted) {
 	result = ht[hv].result;
     } else {
-	unsigned f[3], b[3];
+	XColor fgc, bgc;
 
-	if (pixelToRGB(xw, fg, f) && pixelToRGB(xw, bg, b)) {
+	fgc.pixel = fg;
+	bgc.pixel = bg;
+	if (fastQueryColor(xw, &fgc) && fastQueryColor(xw, &bgc)) {
+	    unsigned f[3], b[3];
 	    double yf, yb, need_light, need_dark;
 	    Bool lighter;
 
+	    f[0] = fgc.red >> 8;
+	    f[1] = fgc.green >> 8;
+	    f[2] = fgc.blue >> 8;
+	    b[0] = bgc.red >> 8;
+	    b[1] = bgc.green >> 8;
+	    b[2] = bgc.blue >> 8;
 	    yf = relativeLuminance(f);
 	    yb = relativeLuminance(b);
 
@@ -5753,7 +5761,11 @@ contrastingForeground(XtermWidget xw, unsigned attr_flags, Pixel fg, Pixel bg)
 			       lighter ? (need_light > 1.0 ? 1.0 : need_light)
 			       : (need_dark < 0.0 ? 0.0 : need_dark),
 			       lighter);
-		(void) rgbToPixel(xw, f, &result);
+		fgc.red = (unsigned short) (f[0] * 257);
+		fgc.green = (unsigned short) (f[1] * 257);
+		fgc.blue = (unsigned short) (f[2] * 257);
+		if (fastAllocColor(xw, &fgc))
+		    result = fgc.pixel;
 		TRACE(("contrastingForeground %#lx on %#lx -> %#lx\n",
 		       fg, bg, result));
 	    }
@@ -6135,7 +6147,7 @@ getXtermForeground(XtermWidget xw, unsigned attr_flags, int color)
 	    /* cache bkg color in r/g/b */
 	    if (!have_bg || bg != bkg.pixel) {
 		bkg.pixel = bg;
-		have_bg = QueryOneColor(xw, &bkg);
+		have_bg = fastQueryColor(xw, &bkg);
 		have = 0;	/* invalidate color cache */
 	    }
 	    if (have_bg) {
@@ -6148,12 +6160,12 @@ getXtermForeground(XtermWidget xw, unsigned attr_flags, int color)
 		    result = ht[hv].dim;	/* return cached color */
 		} else {
 		    work.pixel = result;
-		    if (QueryOneColor(xw, &work)) {
+		    if (fastQueryColor(xw, &work)) {
 			DIM_IT(red);
 			DIM_IT(green);
 			DIM_IT(blue);
 			p = result;
-			if (allocateBestRGB(xw, &work)) {
+			if (fastAllocColor(xw, &work)) {
 			    result = work.pixel;
 			}
 
@@ -6175,11 +6187,11 @@ getXtermForeground(XtermWidget xw, unsigned attr_flags, int color)
 	    XColor work;
 	    last_in = result;
 	    work.pixel = result;
-	    if (QueryOneColor(xw, &work)) {
+	    if (fastQueryColor(xw, &work)) {
 		DIM_IT(red);
 		DIM_IT(green);
 		DIM_IT(blue);
-		if (allocateBestRGB(xw, &work)) {
+		if (fastAllocColor(xw, &work)) {
 		    result = work.pixel;
 		}
 	    }
