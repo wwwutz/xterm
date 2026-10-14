@@ -3725,7 +3725,13 @@ The default is \*(``true\*(''.
 .B "faceName\fP (class\fB FaceName\fP)"
 Specify the pattern for scalable fonts selected from the FreeType
 library if support for that library was compiled into \fI\*n\fR.
-There is no default value.
+The default is \*(``Cascadia Mono PL\*('',
+which is compiled into \fI\*n\fR
+(regular, bold, italic and bold italic),
+so that it does not have to be installed.
+It also is available to \fIfontconfig\fP as a fallback for characters
+missing from other fonts, e.g., braille patterns.
+Cascadia Mono PL is licensed under the SIL Open Font License 1.1.
 .IP
 One or more fonts can be specified, separated by commas.
 If prefixed with \*(``x:\*('' or \*(``x11:\*('' the specification
@@ -3741,7 +3747,7 @@ Two TrueType fonts can be specified in this way.
 The first is the primary font;
 the second acts as a manual override to the \fIfontconfig\fP fontset.
 .IP
-If no \fBfaceName\fP resource is specified,
+If the \fBfaceName\fP resource is empty (e.g., \fB\-fa\ \*(``\*(''\fP),
 or if there is no match for both TrueType normal and bold fonts,
 \fI\*n\fR uses the XLFD (bitmap) \fBfont\fP and related resources.
 .IP
@@ -3777,17 +3783,17 @@ If the application uses double-wide characters and this resource is not given,
 .B "faceSize\fP (class\fB FaceSize\fP)"
 Specify the pointsize for fonts selected from the FreeType
 library if support for that library was compiled into \fI\*n\fR.
-The default is \*(``8.0\*(''
+The default is \*(``12.0\*(''.
 On the \fBVT\ Fonts\fP menu, this corresponds to the \fIDefault\fP entry.
 .IP
-Although the default is \*(``8.0\*('',
+Although the default is \*(``12.0\*('',
 this may not be the same as the pointsize for the default bitmap font,
 i.e., that assigned with the \fB\-fn\fP option,
 or the \fBfont\fP resource.
-The default value of \fBfaceSize\fP is chosen
-to match the size of the \*(``fixed\*('' font,
-making switching between bitmap and TrueType fonts via the font menu
-give comparable sizes for the window.
+The default value of \fBfaceSize\fP is larger than
+the \*(``fixed\*('' font,
+so switching between bitmap and TrueType fonts via the font menu
+changes the size of the window.
 If your \fB\-fn\fP option uses a different pointsize,
 you might want to adjust the \fBfaceSize\fP resource to match.
 .IP

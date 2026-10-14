@@ -106,19 +106,20 @@ EXTRAOBJ	= @EXTRAOBJS@
 
 AUTO_SOURCE	= \
 		builtin_icons.h \
+		embedded_fonts.h \
 		VTparse.cin \
 		Tekparse.cin \
 		VTparse.hin \
 		Tekparse.hin
 
           SRCS1 = button.c cachedGCs.c charproc.c charsets.c cursor.c \
-	  	  data.c doublechr.c fontutils.c input.c \
+	  	  data.c doublechr.c embedfont.c fontutils.c input.c \
 		  keysym2ucs.c linedata.c main.c menu.c misc.c \
 		  print.c ptydata.c scrollback.c \
 		  screen.c scrollbar.c tabs.c util.c version.c xstrings.c \
 		  xtermcap.c VTPrsTbl.c $(EXTRASRC)
           OBJS1 = button$o cachedGCs$o charproc$o charsets$o cursor$o \
-	  	  data$o doublechr$o fontutils$o input$o \
+	  	  data$o doublechr$o embedfont$o fontutils$o input$o \
 		  keysym2ucs$o linedata$o main$o menu$o misc$o \
 		  print$o ptydata$o scrollback$o \
 		  screen$o scrollbar$o tabs$o util$o version$o xstrings$o \
@@ -201,6 +202,15 @@ xterm$x : $(OBJS1)
 
 resize$x : $(OBJS2)
 	@ECHO_LD@$(SHELL) $(srcdir)/plink.sh $(LINK) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS2) $(LIBS)
+
+# fonts compiled into xterm, see embedfont.c
+EMBEDDED_FONTS	= $(srcdir)/cascadia-mono-pl-2407.24/CascadiaMonoPL.ttf \
+		  $(srcdir)/cascadia-mono-pl-2407.24/CascadiaMonoPLItalic.ttf
+
+embedded_fonts.h : $(EMBEDDED_FONTS) $(srcdir)/mkembedfont.sh
+	$(SHELL) $(srcdir)/mkembedfont.sh $(EMBEDDED_FONTS) > $@
+
+embedfont$o : embedded_fonts.h
 
 256colres.h :
 	-$(RM) $@

@@ -158,6 +158,7 @@ extern void xtermSaveVTFonts (XtermWidget /* xw */);
 #define xtermIsInternalCs(ch)	(xtermIsDecGraphic(ch) || xtermIsDecTechnical(ch))
 
 #if OPT_RENDERFONT
+extern void xtermAddEmbeddedFonts (void);
 extern Boolean maybeXftCache(XtermWidget /* xw */, XftFont * /* font */);
 extern Bool xtermXftMissing (XtermWidget /* xw */, XTermXftFonts * /* fontData */, int /* fontNum */, XftFont * /* font */, unsigned /* wc */);
 extern XTermXftFonts *getMyXftFont (XtermWidget /* xw */, int /* which */, int /* fontnum */);
