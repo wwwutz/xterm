@@ -742,6 +742,10 @@ static XtResource xterm_resources[] =
     Bres(XtNfaintIsRelative, XtCFaintIsRelative, screen.faint_relative, False),
 #endif
 
+#if OPT_ISO_COLORS
+    Dres(XtNminimumContrast, XtCMinimumContrast, screen.min_contrast, "3.0"),
+#endif
+
 #if OPT_SHIFT_FONTS
     Bres(XtNshiftFonts, XtCShiftFonts, misc.shift_fonts, True),
 #endif
@@ -11410,6 +11414,7 @@ VTInitialize(Widget wrequest,
 #if OPT_WIDE_ATTRS && OPT_SGR2_HASH
     init_Bres(screen.faint_relative);
 #endif
+    init_Dres(screen.min_contrast);
 
 #if OPT_VT525_COLORS
     screen->assigned_fg = 7;
