@@ -13838,6 +13838,11 @@ ShowCursor(XtermWidget xw)
 	setCgsFore(xw, currentWin, currentCgs, fg_pix);
 	setCgsBack(xw, currentWin, currentCgs, bg_pix);
     }
+#if OPT_ISO_COLORS
+    /* keep the character under a block cursor readable */
+    setCgsFore(xw, currentWin, currentCgs,
+	       contrastingForeground(xw, flags, CGS_FG, CGS_BG));
+#endif
 
     if (screen->cursor_busy == 0
 	&& (screen->cursor_state != ON || screen->cursor_GC != set_at)) {
