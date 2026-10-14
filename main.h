@@ -84,7 +84,7 @@
 #endif
 
 #ifndef DEFFACENAME
-#define DEFFACENAME		"Cascadia Mono PL"	/* embedded, see embedfont.c */
+#define DEFFACENAME		"Hack Braille"	/* embedded, see embedfont.c */
 #endif
 
 #ifndef DEFFACENAME_AUTO

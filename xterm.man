@@ -3725,13 +3725,16 @@ The default is \*(``true\*(''.
 .B "faceName\fP (class\fB FaceName\fP)"
 Specify the pattern for scalable fonts selected from the FreeType
 library if support for that library was compiled into \fI\*n\fR.
-The default is \*(``Cascadia Mono PL\*('',
+The default is \*(``Hack Braille\*('',
 which is compiled into \fI\*n\fR
 (regular, bold, italic and bold italic),
 so that it does not have to be installed.
+It is Hack 3.003 with the braille patterns (U+2800 to U+28FF) added,
+which many text-mode tools use for graphs.
 It also is available to \fIfontconfig\fP as a fallback for characters
-missing from other fonts, e.g., braille patterns.
-Cascadia Mono PL is licensed under the SIL Open Font License 1.1.
+missing from other fonts.
+Hack is licensed under the MIT License,
+and the Bitstream Vera License for the glyphs from Bitstream Vera Sans Mono.
 .IP
 One or more fonts can be specified, separated by commas.
 If prefixed with \*(``x:\*('' or \*(``x11:\*('' the specification

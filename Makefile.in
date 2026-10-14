@@ -204,8 +204,10 @@ resize$x : $(OBJS2)
 	@ECHO_LD@$(SHELL) $(srcdir)/plink.sh $(LINK) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS2) $(LIBS)
 
 # fonts compiled into xterm, see embedfont.c
-EMBEDDED_FONTS	= $(srcdir)/cascadia-mono-pl-2407.24/CascadiaMonoPL.ttf \
-		  $(srcdir)/cascadia-mono-pl-2407.24/CascadiaMonoPLItalic.ttf
+EMBEDDED_FONTS	= $(srcdir)/hack-braille-3.003/HackBraille-Regular.ttf \
+		  $(srcdir)/hack-braille-3.003/HackBraille-Bold.ttf \
+		  $(srcdir)/hack-braille-3.003/HackBraille-Italic.ttf \
+		  $(srcdir)/hack-braille-3.003/HackBraille-BoldItalic.ttf
 
 embedded_fonts.h : $(EMBEDDED_FONTS) $(srcdir)/mkembedfont.sh
 	$(SHELL) $(srcdir)/mkembedfont.sh $(EMBEDDED_FONTS) > $@
