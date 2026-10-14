@@ -5684,10 +5684,25 @@ fastAllocColor(XtermWidget xw, XColor *def)
 }
 
 /*
+ * True if the application chose the same color for text and background,
+ * e.g., to hide it, so minimumContrast should leave it alone.  The pixels can
+ * also be equal by accident, e.g., a palette entry matching the default
+ * background after reverse video swaps colors 0 and 7; that still is fixed.
+ */
+Bool
+sameColorChosen(unsigned attr_flags, CellColor fg_bg)
+{
+    return ((attr_flags & FG_COLOR)
+	    && (attr_flags & BG_COLOR)
+	    && !hasDirectFG(attr_flags) == !hasDirectBG(attr_flags)
+	    && ExtractForeground(fg_bg) == ExtractBackground(fg_bg));
+}
+
+/*
  * Returns a foreground pixel with at least the minimumContrast resource's
  * WCAG 2 contrast ratio against bg, keeping the original if it already has
- * enough.  Equal fg/bg is left alone, since that is used deliberately to hide
- * text.  Faint text gets half the margin, so it still looks dimmer.
+ * enough.  Callers skip text hidden on purpose (see sameColorChosen()).
+ * Faint text gets half the margin, so it still looks dimmer.
  */
 Pixel
 contrastingForeground(XtermWidget xw, unsigned attr_flags, Pixel fg, Pixel bg)
@@ -5712,7 +5727,7 @@ contrastingForeground(XtermWidget xw, unsigned attr_flags, Pixel fg, Pixel bg)
 #else
     (void) attr_flags;
 #endif
-    if (!TScreenOf(xw)->min_contrast_on || wanted <= 1.0 || fg == bg)
+    if (!TScreenOf(xw)->min_contrast_on || wanted <= 1.0)
 	return fg;
 
     /* palette pixels differ mostly in their high bits, so mix them down */
@@ -5906,7 +5921,8 @@ updatedXtermGC(XtermWidget xw, unsigned attr_flags, CellColor fg_bg,
 #endif
 
 #if OPT_ISO_COLORS
-    fg_pix = contrastingForeground(xw, attr_flags, fg_pix, bg_pix);
+    if (!sameColorChosen(attr_flags, fg_bg))
+	fg_pix = contrastingForeground(xw, attr_flags, fg_pix, bg_pix);
 #endif
 
 #if OPT_BLINK_TEXT

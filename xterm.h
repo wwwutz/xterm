@@ -1805,6 +1805,7 @@ extern Boolean AssignBgColor (XtermWidget /* xw */, Pixel /* bg */);
 extern Boolean isDefaultBackground (const char * /* name */);
 extern Boolean isDefaultForeground (const char * /* name */);
 extern CgsEnum whichXtermCgs (XtermWidget /* xw */, unsigned /* attr_flags */, Bool /* hilite */);
+extern Bool sameColorChosen (unsigned /* attr_flags */, CellColor /* fg_bg */);
 extern Pixel contrastingForeground (XtermWidget /* xw */, unsigned /* attr_flags */, Pixel /* fg */, Pixel /* bg */);
 extern GC updatedXtermGC (XtermWidget /* xw */, unsigned /* flags */, CellColor /* fg_bg */, Bool /* hilite */);
 extern Pixel getXtermBackground (XtermWidget /* xw */, unsigned /* flags */, int /* color */);

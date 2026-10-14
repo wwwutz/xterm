@@ -13844,8 +13844,9 @@ ShowCursor(XtermWidget xw)
     }
 #if OPT_ISO_COLORS
     /* keep the character under a block cursor readable */
-    setCgsFore(xw, currentWin, currentCgs,
-	       contrastingForeground(xw, flags, CGS_FG, CGS_BG));
+    if (!sameColorChosen(flags, fg_bg))
+	setCgsFore(xw, currentWin, currentCgs,
+		   contrastingForeground(xw, flags, CGS_FG, CGS_BG));
 #endif
 
     if (screen->cursor_busy == 0
