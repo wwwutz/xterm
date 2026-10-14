@@ -1,0 +1,37 @@
+#!/usr/bin/env beesh
+
+# BEE_VERSION xterm-412-0
+
+# SRCURL[0]="https://invisible-island.net/archives/xterm/xterm-${PKGVERSION}.tgz"
+SRCURL[0]="https://beehive.molgen.mpg.de/e04d8065cf0847573dbd24995c905737/xterm-412.tgz"
+
+# PATCHURL+=()
+
+# build_in_sourcedir
+
+# sourcesubdir_append src
+
+#mee_extract() {
+#    bee_extract "${@}"
+#}
+
+#mee_patch() {
+#    bee_patch "${@}"
+#}
+
+mee_configure() {
+    cd ${S}
+    ./configure \
+        --prefix=/usr \
+        --enable-luit \
+        --enable-wide-chars \
+        --with-app-defaults=/etc/X11/app-defaults
+}
+
+#mee_build() {
+#    bee_build
+#}
+
+#mee_install() {
+#    bee_install
+#}
