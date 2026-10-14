@@ -4549,6 +4549,10 @@ so that it still looks dimmer than normal text.
 .IP
 A value of 1 or less disables the adjustment.
 The default is \*(``3.0\*(''.
+.IP
+The \fBEnable Minimum Contrast\fP entry in the \fIVT Options\fP menu,
+and the \fBset\-min\-contrast\fP action, turn the adjustment off and on
+while \fI\*n\fP is running.
 .TP 8
 .B "mkSamplePass\fP (class\fB MkSamplePass\fP)"
 If \fBmkSampleSize\fP is nonzero,
@@ -6146,6 +6150,9 @@ This entry invokes the \fBset\-jumpscroll(\fItoggle\fB)\fR action.
 .B "reversevideo\fP (class\fB SmeBSB\fP)"
 This entry invokes the \fBset\-reverse\-video(\fItoggle\fB)\fR action.
 .TP 8
+.B "minContrast\fP (class\fB SmeBSB\fP)"
+This entry invokes the \fBset\-min\-contrast(\fItoggle\fB)\fR action.
+.TP 8
 .B "autowrap\fP (class\fB SmeBSB\fP)"
 This entry invokes the \fBset\-autowrap(\fItoggle\fB)\fR action.
 .TP 8
@@ -7061,6 +7068,12 @@ This corresponds to the \fB\-j\fP option and the \fBjumpScroll\fP resource.
 .B Enable Reverse Video\fP (resource \fBreversevideo\fP)
 Enable (or disable) reverse-video.
 This corresponds to the \fB\-rv\fP option and the \fBreverseVideo\fP resource.
+.
+.TP
+.B Enable Minimum Contrast\fP (resource \fBminContrast\fP)
+Enable (or disable) adjusting low-contrast text.
+This corresponds to the \fB\-mincontrast\fP option and the
+\fBminimumContrast\fP resource.
 .
 .TP
 .B Enable Auto Wraparound\fP (resource \fBautowrap\fP)
@@ -8424,6 +8437,12 @@ This action sets, unsets or toggles the \fBprivateColorRegisters\fP resource.
 .B "set\-render\-font(\fIon/off/toggle\fP)"
 This action sets, unsets or toggles the \fBrenderFont\fP resource.
 It is also invoked by the \fBrender\-font\fP entry in \fIfontMenu\fP.
+.TP 8
+.B "set\-min\-contrast(\fIon/off/toggle\fP)"
+This action enables, disables or toggles the adjustment made for the
+\fBminimumContrast\fP resource.
+If that resource is 1 or less, enabling it uses a ratio of 3.0.
+It is also invoked by the \fBminContrast\fP entry in \fIvtMenu\fP.
 .TP 8
 .B "set\-reverse\-video(\fIon/off/toggle\fP)"
 This action sets, unsets or toggles the \fBreverseVideo\fP resource.

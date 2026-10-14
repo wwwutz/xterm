@@ -101,6 +101,7 @@ extern void HandlePrintOnError     PROTO_XT_ACTIONS_ARGS;
 extern void HandlePrintScreen      PROTO_XT_ACTIONS_ARGS;
 extern void HandleRedraw           PROTO_XT_ACTIONS_ARGS;
 extern void HandleRenderFont       PROTO_XT_ACTIONS_ARGS;
+extern void HandleMinContrast      PROTO_XT_ACTIONS_ARGS;
 extern void HandleReverseVideo     PROTO_XT_ACTIONS_ARGS;
 extern void HandleReverseWrap      PROTO_XT_ACTIONS_ARGS;
 extern void HandleScoFunctionKeys  PROTO_XT_ACTIONS_ARGS;
@@ -218,6 +219,9 @@ typedef enum {
     vtMenu_scrollbar,
     vtMenu_jumpscroll,
     vtMenu_reversevideo,
+#if OPT_ISO_COLORS
+    vtMenu_minContrast,
+#endif
     vtMenu_autowrap,
     vtMenu_reversewrap,
     vtMenu_autolinefeed,
@@ -492,6 +496,12 @@ extern void update_activeicon(void);
 extern void update_font_doublesize(void);
 #else
 #define update_font_doublesize() /* nothing */
+#endif
+
+#if OPT_ISO_COLORS
+extern void update_minContrast(void);
+#else
+#define update_minContrast() /* nothing */
 #endif
 
 #if OPT_BOX_CHARS

@@ -5712,7 +5712,7 @@ contrastingForeground(XtermWidget xw, unsigned attr_flags, Pixel fg, Pixel bg)
 #else
     (void) attr_flags;
 #endif
-    if (wanted <= 1.0 || fg == bg)
+    if (!TScreenOf(xw)->min_contrast_on || wanted <= 1.0 || fg == bg)
 	return fg;
 
     /* palette pixels differ mostly in their high bits, so mix them down */

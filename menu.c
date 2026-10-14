@@ -143,6 +143,9 @@ static void do_print           PROTO_XT_CALLBACK_ARGS;
 static void do_print_redir     PROTO_XT_CALLBACK_ARGS;
 static void do_redraw          PROTO_XT_CALLBACK_ARGS;
 static void do_reversevideo    PROTO_XT_CALLBACK_ARGS;
+#if OPT_ISO_COLORS
+static void do_minContrast     PROTO_XT_CALLBACK_ARGS;
+#endif
 static void do_reversewrap     PROTO_XT_CALLBACK_ARGS;
 static void do_scrollbar       PROTO_XT_CALLBACK_ARGS;
 static void do_scrollkey       PROTO_XT_CALLBACK_ARGS;
@@ -342,6 +345,9 @@ MenuEntry vtMenuEntries[] = {
     { "scrollbar",	do_scrollbar,	NULL },
     { "jumpscroll",	do_jumpscroll,	NULL },
     { "reversevideo",	do_reversevideo, NULL },
+#if OPT_ISO_COLORS
+    { "minContrast",	do_minContrast,	NULL },
+#endif
     { "autowrap",	do_autowrap,	NULL },
     { "reversewrap",	do_reversewrap, NULL },
     { "autolinefeed",	do_autolinefeed, NULL },
@@ -808,6 +814,7 @@ domenu(Widget w,
 	    update_scrollbar();
 	    update_jumpscroll();
 	    update_reversevideo();
+	    update_minContrast();
 	    update_autowrap();
 	    update_reversewrap();
 	    update_autolinefeed();
@@ -1463,6 +1470,22 @@ do_reversevideo(Widget gw GCC_UNUSED,
 {
     ReverseVideo(term);
 }
+
+#if OPT_ISO_COLORS
+static void
+do_minContrast(Widget gw GCC_UNUSED,
+	       XtPointer closure GCC_UNUSED,
+	       XtPointer data GCC_UNUSED)
+{
+    TScreen *screen = TScreenOf(term);
+
+    ToggleFlag(screen->min_contrast_on);
+    if (screen->min_contrast_on && screen->min_contrast <= 1.0f)
+	screen->min_contrast = 3.0f;	/* the resource's default */
+    update_minContrast();
+    Redraw();
+}
+#endif
 
 static void
 do_autowrap(Widget gw GCC_UNUSED,
@@ -2567,6 +2590,18 @@ HandleReverseVideo(Widget w,
 		     params, *param_count, w);
 }
 
+#if OPT_ISO_COLORS
+void
+HandleMinContrast(Widget w,
+		  XEvent *event GCC_UNUSED,
+		  String *params,
+		  Cardinal *param_count)
+{
+    handle_vt_toggle(do_minContrast, TScreenOf(term)->min_contrast_on,
+		     params, *param_count, w);
+}
+#endif
+
 void
 HandleAutoWrap(Widget w,
 	       XEvent *event GCC_UNUSED,
@@ -3579,6 +3614,17 @@ update_reversevideo(void)
 		   vtMenu_reversevideo,
 		   (term->misc.re_verse));
 }
+
+#if OPT_ISO_COLORS
+void
+update_minContrast(void)
+{
+    UpdateCheckbox("update_minContrast",
+		   vtMenuEntries,
+		   vtMenu_minContrast,
+		   TScreenOf(term)->min_contrast_on);
+}
+#endif
 
 void
 update_autowrap(void)

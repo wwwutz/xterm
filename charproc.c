@@ -271,6 +271,9 @@ static XtActionsRec actionsList[] = {
     { "set-keep-clipboard",	HandleKeepClipboard },
     { "set-keep-selection",	HandleKeepSelection },
     { "set-marginbell",		HandleMarginBell },
+#if OPT_ISO_COLORS
+    { "set-min-contrast",	HandleMinContrast },
+#endif
     { "set-old-function-keys",	HandleOldFunctionKeys },
     { "set-pop-on-bell",	HandleSetPopOnBell },
     { "set-reverse-video",	HandleReverseVideo },
@@ -11415,6 +11418,7 @@ VTInitialize(Widget wrequest,
     init_Bres(screen.faint_relative);
 #endif
     init_Dres(screen.min_contrast);
+    screen->min_contrast_on = (screen->min_contrast > 1.0f);
 
 #if OPT_VT525_COLORS
     screen->assigned_fg = 7;
