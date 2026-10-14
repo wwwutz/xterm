@@ -4520,6 +4520,30 @@ to the \fBeightBitInput\fP resource.
 .IP
 The default is \*(``__meta_sends_esc__\*(''.
 .TP 8
+.B "minimumContrast\fP (class\fB MinimumContrast\fP)"
+Specifies the minimum contrast ratio between text and its background,
+using the WCAG 2 definition (from 1, for identical colors, to 21,
+for black on white).
+When an application's color choice falls below this ratio,
+e.g., light gray text on a light background or dark blue on black,
+\fI\*n\fP draws the text lighter or darker,
+mixing it toward white or black while keeping its hue,
+until it reaches the ratio.
+The background color is not changed.
+.IP
+The adjustment is made only when drawing:
+the colors which the application requested are still stored,
+and used in screen dumps and color reports.
+It also applies to the character under the cursor.
+.IP
+Text whose color is the same as its background is left alone,
+since applications do that deliberately to hide text.
+Faint text uses a smaller ratio (halfway between 1 and this value),
+so that it still looks dimmer than normal text.
+.IP
+A value of 1 or less disables the adjustment.
+The default is \*(``3.0\*(''.
+.TP 8
 .B "mkSamplePass\fP (class\fB MkSamplePass\fP)"
 If \fBmkSampleSize\fP is nonzero,
 and \fBmkWidth\fP (and \fBcjkWidth\fP) are false,
