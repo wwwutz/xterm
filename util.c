@@ -5615,6 +5615,76 @@ mixToLuminance(unsigned *rgb, unsigned target, double limit, Bool lighter)
 }
 
 /*
+ * True if pixels can be split into r/g/b by the visual's masks.  This is
+ * looser than VisualIsRGB() in misc.c, which also requires 8 significant bits
+ * per channel (servers may report more, e.g., 11), and otherwise costs a
+ * server round-trip per color query/allocation.
+ */
+static Bool
+pixelsAreRGB(XtermWidget xw)
+{
+    return (getVisualInfo(xw) != NULL
+	    && xw->has_rgb
+	    && xw->visInfo->class == TrueColor);
+}
+
+static Bool
+pixelToRGB(XtermWidget xw, Pixel p, unsigned *rgb)
+{
+    Bool result = True;
+
+    if (pixelsAreRGB(xw)) {
+	const unsigned long mask[3] =
+	{
+	    xw->visInfo->red_mask,
+	    xw->visInfo->green_mask,
+	    xw->visInfo->blue_mask
+	};
+	unsigned n;
+
+	for (n = 0; n < 3; ++n) {
+	    unsigned long top = (1UL << xw->rgb_widths[n]) - 1;
+	    unsigned long v = (p & mask[n]) >> xw->rgb_shifts[n];
+	    rgb[n] = (unsigned) ((v * 255 + top / 2) / top);
+	}
+    } else {
+	XColor def;
+
+	def.pixel = p;
+	result = QueryOneColor(xw, &def);
+	rgb[0] = (unsigned) (def.red >> 8);
+	rgb[1] = (unsigned) (def.green >> 8);
+	rgb[2] = (unsigned) (def.blue >> 8);
+    }
+    return result;
+}
+
+static Bool
+rgbToPixel(XtermWidget xw, const unsigned *rgb, Pixel *p)
+{
+    Bool result = True;
+
+    if (pixelsAreRGB(xw)) {
+	unsigned n;
+
+	*p = 0;
+	for (n = 0; n < 3; ++n) {
+	    unsigned long top = (1UL << xw->rgb_widths[n]) - 1;
+	    *p |= ((rgb[n] * top + 127) / 255) << xw->rgb_shifts[n];
+	}
+    } else {
+	XColor def;
+
+	def.red = (unsigned short) (rgb[0] * 257);
+	def.green = (unsigned short) (rgb[1] * 257);
+	def.blue = (unsigned short) (rgb[2] * 257);
+	if ((result = allocateBestRGB(xw, &def)))
+	    *p = def.pixel;
+    }
+    return result;
+}
+
+/*
  * Returns a foreground pixel with at least the minimumContrast resource's
  * WCAG 2 contrast ratio against bg, keeping the original if it already has
  * enough.  Equal fg/bg is left alone, since that is used deliberately to hide
@@ -5623,7 +5693,7 @@ mixToLuminance(unsigned *rgb, unsigned target, double limit, Bool lighter)
 Pixel
 contrastingForeground(XtermWidget xw, unsigned attr_flags, Pixel fg, Pixel bg)
 {
-#define SizeOfContrastHT 64
+#define SizeOfContrastHT 256
     typedef struct {
 	Pixel fg;
 	Pixel bg;
@@ -5635,7 +5705,7 @@ contrastingForeground(XtermWidget xw, unsigned attr_flags, Pixel fg, Pixel bg)
 
     double wanted = (double) TScreenOf(xw)->min_contrast;
     Pixel result = fg;
-    unsigned hv;
+    unsigned long hv;
 
 #if OPT_WIDE_ATTRS
     if (attr_flags & ATR_FAINT)
@@ -5646,28 +5716,21 @@ contrastingForeground(XtermWidget xw, unsigned attr_flags, Pixel fg, Pixel bg)
     if (wanted <= 1.0 || fg == bg)
 	return fg;
 
-    hv = (unsigned) ((fg * 31 + bg) % SizeOfContrastHT);
+    /* palette pixels differ mostly in their high bits, so mix them down */
+    hv = (fg * 0x9E3779B1UL) ^ (bg * 0x85EBCA6BUL);
+    hv = (hv ^ (hv >> 16) ^ (hv >> 8)) % SizeOfContrastHT;
     if (used[hv]
 	&& ht[hv].fg == fg
 	&& ht[hv].bg == bg
 	&& ht[hv].wanted == wanted) {
 	result = ht[hv].result;
     } else {
-	XColor fgc, bgc;
+	unsigned f[3], b[3];
 
-	fgc.pixel = fg;
-	bgc.pixel = bg;
-	if (QueryOneColor(xw, &fgc) && QueryOneColor(xw, &bgc)) {
-	    unsigned f[3], b[3];
+	if (pixelToRGB(xw, fg, f) && pixelToRGB(xw, bg, b)) {
 	    double yf, yb, need_light, need_dark;
 	    Bool lighter;
 
-	    f[0] = fgc.red >> 8;
-	    f[1] = fgc.green >> 8;
-	    f[2] = fgc.blue >> 8;
-	    b[0] = bgc.red >> 8;
-	    b[1] = bgc.green >> 8;
-	    b[2] = bgc.blue >> 8;
 	    yf = relativeLuminance(f);
 	    yb = relativeLuminance(b);
 
@@ -5690,11 +5753,7 @@ contrastingForeground(XtermWidget xw, unsigned attr_flags, Pixel fg, Pixel bg)
 			       lighter ? (need_light > 1.0 ? 1.0 : need_light)
 			       : (need_dark < 0.0 ? 0.0 : need_dark),
 			       lighter);
-		fgc.red = (unsigned short) (f[0] * 257);
-		fgc.green = (unsigned short) (f[1] * 257);
-		fgc.blue = (unsigned short) (f[2] * 257);
-		if (allocateBestRGB(xw, &fgc))
-		    result = fgc.pixel;
+		(void) rgbToPixel(xw, f, &result);
 		TRACE(("contrastingForeground %#lx on %#lx -> %#lx\n",
 		       fg, bg, result));
 	    }
