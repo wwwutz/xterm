@@ -981,6 +981,12 @@ disallow write access to the terminal.
 Turn on the \fBmessages\fP resource, i.e.,
 allow write access to the terminal.
 .TP 8
+.BI \-mincontrast " ratio"
+This option specifies the minimum contrast ratio between text and its
+background; text with less contrast is drawn lighter or darker.
+A value of 1 disables the adjustment.
+This sets the \fBminimumContrast\fP resource.
+.TP 8
 .B "\-mk_width"
 Set the \fBmkWidth\fP resource to \*(``true\*(''.
 This makes \fI\*n\fP use a built-in version of the wide-character width
