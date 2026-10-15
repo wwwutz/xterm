@@ -1,0 +1,40 @@
+#!/usr/bin/env beesh
+
+# BEE_VERSION font-hack-braille-3.003-0
+
+# Hack 3.003 plus the braille patterns U+2800..U+28FF (for TUI graphs),
+# made with mkhackbraille.py (in the tarball); MIT and Bitstream Vera License.
+# xterm and xfce4-terminal also have these fonts compiled in.
+SRCURL[0]="https://beehive.molgen.mpg.de/9d3164696416dac1787155b809fd6787/hack-braille-3.003.tar.gz"
+
+# PATCHURL+=()
+
+# EXCLUDE+=()
+
+# build_in_sourcedir
+
+# sourcesubdir_append src
+
+#mee_extract() {
+#    bee_extract "${@}"
+#}
+
+#mee_patch() {
+#    bee_patch "${@}"
+#}
+
+#mee_configure() {
+#    bee_configure
+#}
+
+#mee_build() {
+#    bee_build
+#}
+
+mee_install() {
+    install -d --mode=755 ${D}${DATAROOTDIR}/fonts/Hack-Braille
+    install -m 644 ${S}/HackBraille-*.ttf ${D}${DATAROOTDIR}/fonts/Hack-Braille/
+    # the Bitstream Vera License asks for its notice to go with the fonts
+    install -d --mode=755 ${D}${DATAROOTDIR}/doc/font-hack-braille
+    install -m 644 ${S}/LICENSE.md ${S}/README ${D}${DATAROOTDIR}/doc/font-hack-braille/
+}

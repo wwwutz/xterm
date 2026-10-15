@@ -1,0 +1,29 @@
+Hack Braille 3.003
+==================
+
+Hack 3.003 (https://github.com/source-foundry/Hack, release v3.003,
+Hack-v3.003-ttf.zip) with the Braille Patterns block U+2800..U+28FF added,
+which Hack lacks and many TUIs use for graphs and spinners.  Built for the
+xterm package, which compiles these fonts in and uses "Hack Braille" as its
+default face.
+
+The braille glyphs are drawn by mkhackbraille.py: 8 square dots on a 2x4
+grid spanning the character cell, the geometry of the Nerd Fonts patcher's
+"rectangle" braille.  No glyphs are taken from other fonts.  The fonts are
+renamed to "Hack Braille" (PostScript "HackBraille-*"), as the Bitstream
+Vera license requires of modified fonts.  Everything else is unchanged.
+
+License: as Hack, see LICENSE.md (MIT for the Hack project's work, Bitstream
+Vera License for the Bitstream Vera Sans Mono glyphs).
+
+Rebuild (needs python3 with fontTools):
+
+    for s in Regular Bold Italic BoldItalic; do
+        python3 mkhackbraille.py Hack-$s.ttf HackBraille-$s.ttf
+    done
+
+Sources (md5):
+    d9ab192896af1ab48c760f3368842b79  Hack-Regular.ttf
+    67bf8301130ac16bb1b0fff12bd181b3  Hack-Bold.ttf
+    b21e6092b451f66197ba0f362446e643  Hack-Italic.ttf
+    95882b264569d98007a23a4b6572f1f4  Hack-BoldItalic.ttf
