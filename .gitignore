@@ -1,0 +1,10 @@
+# local out-of-tree build (see README.md)
+/build/
+
+# Hack Braille font tarball and its copy unpacked into the source tree for
+# building; see README.md for the beehive URL
+/hack-braille-*.tar.gz
+/xterm-412/hack-braille-*/
+
+# screenshots of the Claude Code session, kept local
+/screenshots/Screenshot from *
