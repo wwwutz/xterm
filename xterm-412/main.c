@@ -1064,6 +1064,9 @@ OPTS("+mb",		NO_ARG(XtNmarginBell),			"off"),
 OPTS("-mc",		MY_ARG(XtNmultiClickTime),		NULL),
 OPTS("-mesg",		NO_ARG(XtNmessages),			"off"),
 OPTS("+mesg",		NO_ARG(XtNmessages),			"on"),
+#if OPT_ISO_COLORS
+OPTS("-mincontrast",	MY_ARG(XtNminimumContrast),		NULL),
+#endif
 OPTS("-ms",		MY_ARG(XtNpointerColor),		NULL),
 OPTS("-nb",		MY_ARG(XtNnMarginBell),			NULL),
 OPTS("-nomap",		NO_ARG(XtNnotMapped),			"on"),
@@ -1287,6 +1290,9 @@ static OptionHelp xtermOptions[] = {
 { "-/+mb",                 "turn on/off margin bell" },
 { "-mc milliseconds",      "multiclick time in milliseconds" },
 { "-/+mesg",               "forbid/allow messages" },
+#if OPT_ISO_COLORS
+{ "-mincontrast ratio",    "minimum text/background contrast ratio" },
+#endif
 { "-ms color",             "pointer color" },
 { "-nb number",            "margin bell in characters from right end" },
 { "-/+nomap",              "turn off/on initial mapping of window" },

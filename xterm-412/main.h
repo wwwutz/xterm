@@ -84,7 +84,7 @@
 #endif
 
 #ifndef DEFFACENAME
-#define DEFFACENAME		NULL
+#define DEFFACENAME		"Hack Braille"	/* embedded, see embedfont.c */
 #endif
 
 #ifndef DEFFACENAME_AUTO
@@ -92,7 +92,7 @@
 #endif
 
 #ifndef DEFFACESIZE
-#define DEFFACESIZE		"8.0"
+#define DEFFACESIZE		"12.0"
 #endif
 
 #ifndef DEF_ALLOW_COLOR

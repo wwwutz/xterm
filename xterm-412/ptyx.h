@@ -2577,6 +2577,8 @@ typedef struct {
 #if OPT_WIDE_ATTRS && OPT_SGR2_HASH
 	Boolean		faint_relative;	/* faint is relative?		*/
 #endif
+	float		min_contrast;	/* minimum fg/bg contrast ratio	*/
+	Boolean		min_contrast_on; /* minimumContrast menu toggle	*/
 #if OPT_VT525_COLORS
 	int		assigned_fg;	/* DECAC			*/
 	int		assigned_bg;

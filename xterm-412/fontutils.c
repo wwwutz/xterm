@@ -3542,6 +3542,7 @@ xtermComputeFontInfo(XtermWidget xw,
 
 	    if (work->xft_defaults == NULL) {
 		FcInit();
+		xtermAddEmbeddedFonts();
 		work->xft_defaults = FcPatternCreate();
 		XftDefaultSubstitute(screen->display,
 				     XScreenNumberOfScreen(XtScreen(xw)),

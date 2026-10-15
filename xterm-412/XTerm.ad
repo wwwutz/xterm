@@ -78,6 +78,7 @@
 *vtMenu*scrollbar*Label:  Enable Scrollbar
 *vtMenu*jumpscroll*Label:  Enable Jump Scroll
 *vtMenu*reversevideo*Label:  Enable Reverse Video
+*vtMenu*minContrast*Label:  Enable Minimum Contrast
 *vtMenu*autowrap*Label:  Enable Auto Wraparound
 *vtMenu*reversewrap*Label:  Enable Reverse Wraparound
 *vtMenu*autolinefeed*Label:  Enable Auto Linefeed

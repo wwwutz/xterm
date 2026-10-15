@@ -271,6 +271,9 @@ static XtActionsRec actionsList[] = {
     { "set-keep-clipboard",	HandleKeepClipboard },
     { "set-keep-selection",	HandleKeepSelection },
     { "set-marginbell",		HandleMarginBell },
+#if OPT_ISO_COLORS
+    { "set-min-contrast",	HandleMinContrast },
+#endif
     { "set-old-function-keys",	HandleOldFunctionKeys },
     { "set-pop-on-bell",	HandleSetPopOnBell },
     { "set-reverse-video",	HandleReverseVideo },
@@ -740,6 +743,10 @@ static XtResource xterm_resources[] =
 
 #if OPT_ISO_COLORS && OPT_WIDE_ATTRS && OPT_SGR2_HASH
     Bres(XtNfaintIsRelative, XtCFaintIsRelative, screen.faint_relative, False),
+#endif
+
+#if OPT_ISO_COLORS
+    Dres(XtNminimumContrast, XtCMinimumContrast, screen.min_contrast, "3.0"),
 #endif
 
 #if OPT_SHIFT_FONTS
@@ -11410,6 +11417,8 @@ VTInitialize(Widget wrequest,
 #if OPT_WIDE_ATTRS && OPT_SGR2_HASH
     init_Bres(screen.faint_relative);
 #endif
+    init_Dres(screen.min_contrast);
+    screen->min_contrast_on = (screen->min_contrast > 1.0f);
 
 #if OPT_VT525_COLORS
     screen->assigned_fg = 7;
@@ -13833,6 +13842,12 @@ ShowCursor(XtermWidget xw)
 	setCgsFore(xw, currentWin, currentCgs, fg_pix);
 	setCgsBack(xw, currentWin, currentCgs, bg_pix);
     }
+#if OPT_ISO_COLORS
+    /* keep the character under a block cursor readable */
+    if (!sameColorChosen(flags, fg_bg))
+	setCgsFore(xw, currentWin, currentCgs,
+		   contrastingForeground(xw, flags, CGS_FG, CGS_BG));
+#endif
 
     if (screen->cursor_busy == 0
 	&& (screen->cursor_state != ON || screen->cursor_GC != set_at)) {

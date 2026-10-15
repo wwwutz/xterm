@@ -597,6 +597,7 @@ extern char **environ;
 #define XtNmessages		"messages"
 #define XtNmetaSendsEscape	"metaSendsEscape"
 #define XtNminBufSize		"minBufSize"
+#define XtNminimumContrast	"minimumContrast"
 #define XtNmkSamplePass		"mkSamplePass"
 #define XtNmkSampleSize		"mkSampleSize"
 #define XtNmkWidth		"mkWidth"
@@ -871,6 +872,7 @@ extern char **environ;
 #define XtCMessages		"Messages"
 #define XtCMetaSendsEscape	"MetaSendsEscape"
 #define XtCMinBufSize		"MinBufSize"
+#define XtCMinimumContrast	"MinimumContrast"
 #define XtCMkSamplePass		"MkSamplePass"
 #define XtCMkSampleSize		"MkSampleSize"
 #define XtCMkWidth		"MkWidth"
@@ -1803,6 +1805,8 @@ extern Boolean AssignBgColor (XtermWidget /* xw */, Pixel /* bg */);
 extern Boolean isDefaultBackground (const char * /* name */);
 extern Boolean isDefaultForeground (const char * /* name */);
 extern CgsEnum whichXtermCgs (XtermWidget /* xw */, unsigned /* attr_flags */, Bool /* hilite */);
+extern Bool sameColorChosen (unsigned /* attr_flags */, CellColor /* fg_bg */);
+extern Pixel contrastingForeground (XtermWidget /* xw */, unsigned /* attr_flags */, Pixel /* fg */, Pixel /* bg */);
 extern GC updatedXtermGC (XtermWidget /* xw */, unsigned /* flags */, CellColor /* fg_bg */, Bool /* hilite */);
 extern Pixel getXtermBackground (XtermWidget /* xw */, unsigned /* flags */, int /* color */);
 extern Pixel getXtermForeground (XtermWidget /* xw */, unsigned /* flags */, int /* color */);
