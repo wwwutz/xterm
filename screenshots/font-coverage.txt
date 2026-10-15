@@ -1,0 +1,52 @@
+family                         sp  braille  box block geom powerl nficon  glyphs     KB
+Cascadia Mono PL              100  256/256  128    32   96      8      0    2463    723
+CommitMono                    100  256/256  127    32   62      7      0    1172    269
+CozetteVector                   -  256/256  128    32   96      8    166    6045    634
+FreeMono                      100  256/256  128    32   96      0      0    4160    570
+Iosevka                        90  256/256  128    32   96     10      0    7477   9610
+JetBrainsMono Nerd Font Mono  100  256/256  128    32   43      8    737   12225   2512
+JuliaMono                     100  256/256  128    32   96      8      7   11190   3184
+Maple Mono                    100  256/256  128    32   43      7      0    1433    258
+Sarasa Term SC                 90  256/256  128    32   96     10      0   51247  13761
+Spleen 8x16                   100  256/256  128    32   15      7      0     978     66
+Terminus (TTF)                100  256/256  120    30   15      7      0    1356    488
+Unifont                        90  256/256  128    32   96      0      0   58909   5196
+0xProto                       100    0/256  128     0    0      0      0     718    206
+Anonymous Pro                 100    0/256   40     0    2      0      0     621    154
+Atkinson Hyperlegible Mono    100    0/256    0     0    1      0      0     359     52
+Azeret Mono                    90    0/256    0     0    3      0      0     431    103
+Chivo Mono                    100    0/256    0     0    1      0      0     641    120
+Courier Prime                 100    0/256    0     0    1      0      0     382     69
+Cousine                       100    0/256   40     8   16      0      0    2280    289
+DM Mono                       100    0/256    0     0    1      0      0     380     48
+DejaVu Sans Mono              100    0/256  128    32   96      0      0    3322    332
+Fira Code                     100    0/256  128    32   63      7      0    1585    282
+Fira Mono                     100    0/256  116    32   55      0      0    1349    170
+Fragment Mono                 100    0/256    0     0   27      0      0     487    122
+Geist Mono                    100    0/256  128    32   12      0      0     889    167
+Google Sans Code              100    0/256  128    32   16      0      0     668    123
+Hack                          100    0/256  128    32   96      7      0    1546    302
+IBM Plex Mono                 100    0/256  128    32    1      0      0     928    132
+Inconsolata                   100    0/256  128    32    5      0      0     880    339
+Intel One Mono                100    0/256  128    32    0      7      0     793    122
+Intel One Mono                100    0/256  128    32    0      7      0     793    122
+JetBrains Mono                 90    0/256  128    32   38      7      0     975    182
+Kode Mono                     100    0/256   11     0    2      7      0     437    254
+Lekton                         90    0/256    0     0    1      0      0     352    111
+Lilex                         100    0/256  128    32   16      7      0    1148    213
+Martian Mono                  100    0/256    0     0    0      0      0     511    144
+Monaspace Neon Var            100    0/256  128    32   96      8      0    2460   1607
+NanumGothicCoding              90    0/256   68     1   35      0      0   12445   2261
+Noto Sans Mono                  -    0/256  128    32   96      0      0    3488   1668
+Oxygen Mono                     -    0/256    0     0    1      0      0     358     67
+PT Mono                       100    0/256   40     8   15      0      0     805    181
+Recursive                       -    0/256    0     0   13      0      0     744   2323
+Red Hat Mono                  100    0/256    0     0    0      0      0     403     66
+Roboto Mono                   100    0/256    0     0    1      0      0     875    179
+Share Tech Mono                90    0/256    0     0    2      0      0     265     42
+Sometype Mono                 100    0/256    0     0    1      0      1     456     62
+Space Mono                    100    0/256    0     0    1      0      0     624     97
+Ubuntu Mono                   100    0/256   40     4    1      0      3    1219    200
+Ubuntu Sans Mono              100    0/256   40     4    2      0      0    1223    173
+Victor Mono                   100    0/256  128    32   96      7      0    1269    189
+mononoki                      100    0/256  128    32    0      8      0     921    118
