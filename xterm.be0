@@ -1,11 +1,15 @@
 #!/usr/bin/env beesh
 
-# BEE_VERSION xterm-412-0
+# BEE_VERSION xterm-412-5
 
 # SRCURL[0]="https://invisible-island.net/archives/xterm/xterm-${PKGVERSION}.tgz"
 SRCURL[0]="https://beehive.molgen.mpg.de/e04d8065cf0847573dbd24995c905737/xterm-412.tgz"
+# Hack Braille 3.003 (Hack plus braille; MIT, Bitstream Vera), compiled in by xterm-412-embedded-font.patch
+SRCURL[1]="https://beehive.molgen.mpg.de/9d3164696416dac1787155b809fd6787/hack-braille-3.003.tar.gz"
 
-# PATCHURL+=()
+# local names carry the md5: bee reuses any cached file of the same name
+PATCHURL+=("https://beehive.molgen.mpg.de/84831508305dd78cc9b8914ffbb417fa/xterm-412-min-contrast.patch xterm-412-min-contrast-84831508.patch")
+PATCHURL+=("https://beehive.molgen.mpg.de/b7d6f0620249cf85c850feb359c43fec/xterm-412-embedded-font.patch xterm-412-embedded-font-b7d6f062.patch")
 
 # build_in_sourcedir
 

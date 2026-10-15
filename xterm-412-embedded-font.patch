@@ -1,0 +1,261 @@
+xterm: embed Hack Braille and make it the default font
+
+Compile Hack Braille (Hack 3.003 plus the braille patterns U+2800..U+28FF,
+regular, bold, italic and bold italic) into xterm and default faceName to
+"Hack Braille" at 12 points.  The fonts are registered with fontconfig
+from memory (memfd) at startup; nothing is installed.  faceName ""
+still selects bitmap fonts.  License as Hack: MIT and Bitstream Vera.
+
+Needs hack-braille-3.003/ (HackBraille-*.ttf, LICENSE.md, README,
+mkhackbraille.py) unpacked into the source tree.
+Apply after xterm-412-min-contrast.patch.
+
+Commits (branch embedded-font on xterm-412):
+  30df42b Embed Cascadia Mono PL and make it the default font
+  d361a44 Embed Hack Braille instead of Cascadia Mono PL
+
+diff --git a/Makefile.in b/Makefile.in
+index 172e4c6..506482a 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -106,19 +106,20 @@ EXTRAOBJ	= @EXTRAOBJS@
+ 
+ AUTO_SOURCE	= \
+ 		builtin_icons.h \
++		embedded_fonts.h \
+ 		VTparse.cin \
+ 		Tekparse.cin \
+ 		VTparse.hin \
+ 		Tekparse.hin
+ 
+           SRCS1 = button.c cachedGCs.c charproc.c charsets.c cursor.c \
+-	  	  data.c doublechr.c fontutils.c input.c \
++	  	  data.c doublechr.c embedfont.c fontutils.c input.c \
+ 		  keysym2ucs.c linedata.c main.c menu.c misc.c \
+ 		  print.c ptydata.c scrollback.c \
+ 		  screen.c scrollbar.c tabs.c util.c version.c xstrings.c \
+ 		  xtermcap.c VTPrsTbl.c $(EXTRASRC)
+           OBJS1 = button$o cachedGCs$o charproc$o charsets$o cursor$o \
+-	  	  data$o doublechr$o fontutils$o input$o \
++	  	  data$o doublechr$o embedfont$o fontutils$o input$o \
+ 		  keysym2ucs$o linedata$o main$o menu$o misc$o \
+ 		  print$o ptydata$o scrollback$o \
+ 		  screen$o scrollbar$o tabs$o util$o version$o xstrings$o \
+@@ -202,6 +203,17 @@ xterm$x : $(OBJS1)
+ resize$x : $(OBJS2)
+ 	@ECHO_LD@$(SHELL) $(srcdir)/plink.sh $(LINK) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS2) $(LIBS)
+ 
++# fonts compiled into xterm, see embedfont.c
++EMBEDDED_FONTS	= $(srcdir)/hack-braille-3.003/HackBraille-Regular.ttf \
++		  $(srcdir)/hack-braille-3.003/HackBraille-Bold.ttf \
++		  $(srcdir)/hack-braille-3.003/HackBraille-Italic.ttf \
++		  $(srcdir)/hack-braille-3.003/HackBraille-BoldItalic.ttf
++
++embedded_fonts.h : $(EMBEDDED_FONTS) $(srcdir)/mkembedfont.sh
++	$(SHELL) $(srcdir)/mkembedfont.sh $(EMBEDDED_FONTS) > $@
++
++embedfont$o : embedded_fonts.h
++
+ 256colres.h :
+ 	-$(RM) $@
+ 	perl $(srcdir)/256colres.pl > $@
+diff --git a/embedfont.c b/embedfont.c
+new file mode 100644
+index 0000000..e090e90
+--- /dev/null
++++ b/embedfont.c
+@@ -0,0 +1,60 @@
++/*
++ * Register the TrueType fonts compiled into xterm (see mkembedfont.sh) with
++ * fontconfig, so that the default faceName works without installing them.
++ *
++ * fontconfig only adds application fonts from files, so each font is copied
++ * into an anonymous memory file (memfd) and added by its /proc/self/fd path.
++ * fontconfig then sees all of its styles and named instances (e.g., Bold in a
++ * variable font), and Xft opens them through that path.  The descriptors stay
++ * open for the life of the process, and are not inherited by the shell.
++ */
++
++#define _GNU_SOURCE		/* memfd_create */
++
++#include <xterm.h>
++#include <fontutils.h>
++
++#if OPT_RENDERFONT
++
++#include <sys/mman.h>
++#include <unistd.h>
++
++#include <embedded_fonts.h>
++
++void
++xtermAddEmbeddedFonts(void)
++{
++    static Bool done = False;
++    size_t n;
++
++    if (done)
++	return;
++    done = True;
++
++    for (n = 0; n < XtNumber(embedded_fonts); ++n) {
++	const unsigned char *data = embedded_fonts[n].data;
++	size_t left = embedded_fonts[n].size;
++	char path[40];
++	int fd;
++
++	if ((fd = memfd_create("xterm-font", MFD_CLOEXEC)) < 0) {
++	    TRACE(("xtermAddEmbeddedFonts: memfd_create failed\n"));
++	    return;
++	}
++	while (left != 0) {
++	    ssize_t wrote = write(fd, data, left);
++	    if (wrote <= 0)
++		break;
++	    data += wrote;
++	    left -= (size_t) wrote;
++	}
++	sprintf(path, "/proc/self/fd/%d", fd);
++	if (left != 0
++	    || !FcConfigAppFontAddFile(NULL, (const FcChar8 *) path)) {
++	    TRACE(("xtermAddEmbeddedFonts: cannot add %s\n", path));
++	    close(fd);
++	}
++    }
++}
++
++#endif /* OPT_RENDERFONT */
+diff --git a/fontutils.c b/fontutils.c
+index c4ab947..c7e07dc 100644
+--- a/fontutils.c
++++ b/fontutils.c
+@@ -3542,6 +3542,7 @@ xtermComputeFontInfo(XtermWidget xw,
+ 
+ 	    if (work->xft_defaults == NULL) {
+ 		FcInit();
++		xtermAddEmbeddedFonts();
+ 		work->xft_defaults = FcPatternCreate();
+ 		XftDefaultSubstitute(screen->display,
+ 				     XScreenNumberOfScreen(XtScreen(xw)),
+diff --git a/fontutils.h b/fontutils.h
+index 90d1caf..4855330 100644
+--- a/fontutils.h
++++ b/fontutils.h
+@@ -158,6 +158,7 @@ extern void xtermSaveVTFonts (XtermWidget /* xw */);
+ #define xtermIsInternalCs(ch)	(xtermIsDecGraphic(ch) || xtermIsDecTechnical(ch))
+ 
+ #if OPT_RENDERFONT
++extern void xtermAddEmbeddedFonts (void);
+ extern Boolean maybeXftCache(XtermWidget /* xw */, XftFont * /* font */);
+ extern Bool xtermXftMissing (XtermWidget /* xw */, XTermXftFonts * /* fontData */, int /* fontNum */, XftFont * /* font */, unsigned /* wc */);
+ extern XTermXftFonts *getMyXftFont (XtermWidget /* xw */, int /* which */, int /* fontnum */);
+diff --git a/main.h b/main.h
+index e471acf..17c9a1e 100644
+--- a/main.h
++++ b/main.h
+@@ -84,7 +84,7 @@
+ #endif
+ 
+ #ifndef DEFFACENAME
+-#define DEFFACENAME		NULL
++#define DEFFACENAME		"Hack Braille"	/* embedded, see embedfont.c */
+ #endif
+ 
+ #ifndef DEFFACENAME_AUTO
+@@ -92,7 +92,7 @@
+ #endif
+ 
+ #ifndef DEFFACESIZE
+-#define DEFFACESIZE		"8.0"
++#define DEFFACESIZE		"12.0"
+ #endif
+ 
+ #ifndef DEF_ALLOW_COLOR
+diff --git a/mkembedfont.sh b/mkembedfont.sh
+new file mode 100755
+index 0000000..d920c02
+--- /dev/null
++++ b/mkembedfont.sh
+@@ -0,0 +1,27 @@
++#!/bin/sh
++# Generate embedded_fonts.h, which embedfont.c compiles into xterm, from the
++# font files given as arguments.  Uses only od and sed.
++set -e
++
++echo "/* generated by mkembedfont.sh - do not edit */"
++n=0
++for font in "$@"; do
++	echo
++	echo "/* ${font##*/} */"
++	echo "static const unsigned char embedded_font_$n[] = {"
++	od -An -v -tx1 "$font" | sed -e 's/ *\([0-9a-f][0-9a-f]\)/0x\1,/g'
++	echo "};"
++	n=`expr $n + 1`
++done
++
++echo
++echo "static const struct {"
++echo "    const unsigned char *data;"
++echo "    size_t size;"
++echo "} embedded_fonts[] = {"
++n=0
++for font in "$@"; do
++	echo "    { embedded_font_$n, sizeof(embedded_font_$n) },"
++	n=`expr $n + 1`
++done
++echo "};"
+diff --git a/xterm.man b/xterm.man
+index 4321f95..693cbc5 100644
+--- a/xterm.man
++++ b/xterm.man
+@@ -3725,7 +3725,16 @@ The default is \*(``true\*(''.
+ .B "faceName\fP (class\fB FaceName\fP)"
+ Specify the pattern for scalable fonts selected from the FreeType
+ library if support for that library was compiled into \fI\*n\fR.
+-There is no default value.
++The default is \*(``Hack Braille\*('',
++which is compiled into \fI\*n\fR
++(regular, bold, italic and bold italic),
++so that it does not have to be installed.
++It is Hack 3.003 with the braille patterns (U+2800 to U+28FF) added,
++which many text-mode tools use for graphs.
++It also is available to \fIfontconfig\fP as a fallback for characters
++missing from other fonts.
++Hack is licensed under the MIT License,
++and the Bitstream Vera License for the glyphs from Bitstream Vera Sans Mono.
+ .IP
+ One or more fonts can be specified, separated by commas.
+ If prefixed with \*(``x:\*('' or \*(``x11:\*('' the specification
+@@ -3741,7 +3750,7 @@ Two TrueType fonts can be specified in this way.
+ The first is the primary font;
+ the second acts as a manual override to the \fIfontconfig\fP fontset.
+ .IP
+-If no \fBfaceName\fP resource is specified,
++If the \fBfaceName\fP resource is empty (e.g., \fB\-fa\ \*(``\*(''\fP),
+ or if there is no match for both TrueType normal and bold fonts,
+ \fI\*n\fR uses the XLFD (bitmap) \fBfont\fP and related resources.
+ .IP
+@@ -3777,17 +3786,17 @@ If the application uses double-wide characters and this resource is not given,
+ .B "faceSize\fP (class\fB FaceSize\fP)"
+ Specify the pointsize for fonts selected from the FreeType
+ library if support for that library was compiled into \fI\*n\fR.
+-The default is \*(``8.0\*(''
++The default is \*(``12.0\*(''.
+ On the \fBVT\ Fonts\fP menu, this corresponds to the \fIDefault\fP entry.
+ .IP
+-Although the default is \*(``8.0\*('',
++Although the default is \*(``12.0\*('',
+ this may not be the same as the pointsize for the default bitmap font,
+ i.e., that assigned with the \fB\-fn\fP option,
+ or the \fBfont\fP resource.
+-The default value of \fBfaceSize\fP is chosen
+-to match the size of the \*(``fixed\*('' font,
+-making switching between bitmap and TrueType fonts via the font menu
+-give comparable sizes for the window.
++The default value of \fBfaceSize\fP is larger than
++the \*(``fixed\*('' font,
++so switching between bitmap and TrueType fonts via the font menu
++changes the size of the window.
+ If your \fB\-fn\fP option uses a different pointsize,
+ you might want to adjust the \fBfaceSize\fP resource to match.
+ .IP
