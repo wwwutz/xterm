@@ -1,4 +1,7 @@
 #!/bin/sh
+# Copyright 2026 by Peter Marquardt <wwwutz@users.noreply.github.com>
+# Licensed as xterm, see the notice in embedfont.c.
+#
 # Generate embedded_fonts.h, which embedfont.c compiles into xterm, from the
 # font files given as arguments.  Uses only od and sed.
 set -e
