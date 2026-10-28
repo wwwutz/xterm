@@ -14,7 +14,8 @@ renamed to "Hack Braille" (PostScript "HackBraille-*"), as the Bitstream
 Vera license requires of modified fonts.  Everything else is unchanged.
 
 License: as Hack, see LICENSE.md (MIT for the Hack project's work, Bitstream
-Vera License for the Bitstream Vera Sans Mono glyphs).
+Vera License for the Bitstream Vera Sans Mono glyphs).  mkhackbraille.py
+itself is under the MIT License (see its header).
 
 Rebuild (needs python3 with fontTools):
 

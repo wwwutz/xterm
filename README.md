@@ -1,6 +1,6 @@
 # xterm 412: readable colours, braille-capable default font
 
-Development repository for the mariux64 package `xterm-412-5` (see
+Development repository for the mariux64 package `xterm-412-6` (see
 `xterm.be0`, as committed in bee-files) and the Hack Braille font.
 
 - **`minimumContrast`.** Text whose WCAG 2 contrast ratio against its
@@ -62,4 +62,9 @@ To remake the fonts from Hack 3.003 (needs Python with fontTools):
 
 xterm: X11/MIT style (see `xterm-412/COPYING`). Hack Braille: as Hack, MIT
 and the Bitstream Vera License (`hack-braille/LICENSE.md`). The changes here
-are under the licence of the project they change.
+are under the licence of the project they change; the files they add name
+their author.
+
+The rest of this repository (the bee files, this README, `mkhackbraille.py`,
+the test scripts and the screenshots) is Copyright 2026 Peter Marquardt
+<wwwutz@users.noreply.github.com> and under the MIT License (`LICENSE`).

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Peter Marquardt <wwwutz@users.noreply.github.com>
+# SPDX-License-Identifier: MIT
 """Make "Hack Braille" from Hack 3.003: add the Braille Patterns block.
 
 Usage: mkhackbraille.py Hack-Style.ttf HackBraille-Style.ttf
